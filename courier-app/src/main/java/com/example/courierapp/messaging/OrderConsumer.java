@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class OrderConsumer {
-    private final KafkaTemplate<String,String> kafkaTemplate;
+    private final KafkaTemplate<Integer,String> kafkaTemplate;
     private final DeliveryService service;
 
     @KafkaListener(id = "delivery1", topics = "notification", topicPartitions = @TopicPartition(topic = "notification",
             partitions = "1"))
-    public void consumeOrders(final ConsumerRecord<String,String> record) throws InterruptedException {
+    public void consumeOrders(final ConsumerRecord<Integer,String> record) throws InterruptedException {
         log.info("Get order with ID: {}, Status: {}",record.key(),record.value());
 
         service.deliver();

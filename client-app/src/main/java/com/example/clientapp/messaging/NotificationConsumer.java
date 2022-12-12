@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class NotificationConsumer {
-    private final KafkaTemplate<String, String> template;
+    private final KafkaTemplate<Integer, String> template;
     private final OrderService orderService;
 
     @KafkaListener(id = "client", topics = "notification")
-    public void consumeNotification(final ConsumerRecord<String, String> record) {
+    public void consumeNotification(final ConsumerRecord<Integer, String> record) {
         log.info("Received on topic {}, offset {}, partition {}: {}={}",
                 record.topic(),
                 record.offset(),

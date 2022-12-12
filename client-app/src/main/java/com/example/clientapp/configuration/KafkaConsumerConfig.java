@@ -1,4 +1,4 @@
-package com.example.palmetto.configuration;
+package com.example.clientapp.configuration;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
@@ -16,7 +16,7 @@ import java.util.Map;
 @Configuration
 public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
-    String bootstrapServer;
+    private String bootstrapServer;
 
     @Bean
     ConcurrentKafkaListenerContainerFactory<Integer, String>

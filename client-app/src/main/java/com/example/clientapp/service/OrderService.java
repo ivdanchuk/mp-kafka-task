@@ -20,32 +20,32 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final OrderStatusRepository orderStatusRepository;
 
-    public CustomerOrder createOrder (OrderDTO dto){
+    public CustomerOrder createOrder(OrderDTO dto) {
 
         OrderItem orderItem = orderItemRepository.findById(dto.getItemId()).orElseThrow();
 
         CustomerOrder order = new CustomerOrder();
         order.setItems(List.of(orderItem));
-        order.setOrderStatuses(List.of(createOrderStatus(order,OrderStatusEnum.RECEIVED)));
+        order.setOrderStatuses(List.of(createOrderStatus(order, OrderStatusEnum.RECEIVED)));
 
         customerOrderRepository.save(order);
         return order;
     }
 
-    public OrderStatus addOrderStatus(String key, String value){
+    public OrderStatus addOrderStatus(Integer key, String value) {
 
-        CustomerOrder order = customerOrderRepository.findById(Integer.parseInt(key)).orElseThrow();
+        CustomerOrder order = customerOrderRepository.findById(key).orElseThrow();
 
         OrderStatusEnum status =
                 Arrays.stream(OrderStatusEnum.values())
                         .filter(s -> value.equals(s.toString()))
                         .findFirst()
-                        .orElseThrow();
-        OrderStatus orderStatus = createOrderStatus(order,status);
+                        .orElseThrow(() -> new RuntimeException(String.format("Status %s not found in OrderStatusEnum for orderId=%d", value, key)));
+        OrderStatus orderStatus = createOrderStatus(order, status);
         return orderStatusRepository.save(orderStatus);
     }
 
-    public OrderStatus createOrderStatus(CustomerOrder order, OrderStatusEnum status){
+    public OrderStatus createOrderStatus(CustomerOrder order, OrderStatusEnum status) {
         OrderStatus orderStatus = new OrderStatus();
         orderStatus.setStatus(status);
         orderStatus.setDateTime(LocalDateTime.now());
@@ -53,13 +53,13 @@ public class OrderService {
         return orderStatus;
     }
 
-    public OrderStatus getOrderStatus(Integer orderId){
+    public OrderStatus getOrderStatus(Integer orderId) {
         CustomerOrder order = customerOrderRepository.findById(orderId).orElseThrow();
         OrderStatus orderStatus = order.getOrderStatuses()
                 .stream()
                 .sorted(Comparator.comparingInt(OrderStatus::getId).reversed())
                 .findFirst()
-                .orElseThrow(()-> new RuntimeException(String.format("Status of order with ID=%d not found",orderId)));
+                .orElseThrow(() -> new RuntimeException(String.format("Status of order with ID=%d not found", orderId)));
         return orderStatus;
     }
 

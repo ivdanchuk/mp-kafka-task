@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
     private final CustomerOrderRepository orderRepository;
     private final OrderService orderService;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<Integer, String> kafkaTemplate;
 
     @PostMapping("/order")
     public ResponseEntity<String> createOrder(@RequestBody OrderDTO dto) {
         CustomerOrder order = orderService.createOrder(dto);
 
-        kafkaTemplate.send("orders", order.getId().toString(),
+        kafkaTemplate.send("orders", order.getId(),
                 OrderStatusEnum.RECEIVED.toString());
 
         return ResponseEntity.ok(String.format("Order id: %s", order.getId()));
