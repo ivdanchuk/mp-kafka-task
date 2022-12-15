@@ -18,13 +18,13 @@ public class OrderController {
     private final KafkaTemplate<Integer, String> kafkaTemplate;
 
     @PostMapping("/order")
-    public ResponseEntity<String> createOrder(@RequestBody OrderDTO dto) {
+    public ResponseEntity<Integer> createOrder(@RequestBody OrderDTO dto) {
         CustomerOrder order = orderService.createOrder(dto);
 
         kafkaTemplate.send("orders", order.getId(),
                 OrderStatusEnum.RECEIVED.toString());
 
-        return ResponseEntity.ok(String.format("Order id: %s", order.getId()));
+        return ResponseEntity.ok(order.getId());
     }
 
     @GetMapping("/order/{orderId}")
