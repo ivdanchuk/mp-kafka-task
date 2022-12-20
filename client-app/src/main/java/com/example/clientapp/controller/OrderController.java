@@ -20,7 +20,6 @@ public class OrderController {
     @PostMapping("/order")
     public ResponseEntity<Integer> createOrder(@RequestBody OrderDTO dto) {
         CustomerOrder order = orderService.createOrder(dto);
-
         kafkaTemplate.send("orders", order.getId(),
                 OrderStatusEnum.RECEIVED.toString());
 

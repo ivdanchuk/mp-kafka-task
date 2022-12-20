@@ -23,7 +23,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Slf4j
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class OrderControllerWithContainerTest {
+public class OrderControllerClientIntegrationTest {
     @Container
     static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"));
 
@@ -40,7 +40,7 @@ public class OrderControllerWithContainerTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void shouldGetNewOrderId(){
+    public void shouldGetNewOrderId() throws InterruptedException {
         String uri = "http://localhost:"+ localPort +"/order";
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setQuantity(1);
@@ -48,12 +48,12 @@ public class OrderControllerWithContainerTest {
         HttpEntity<OrderDTO> httpEntity = new HttpEntity<>(orderDTO);
 
         Integer orderId = restTemplate.exchange(uri, HttpMethod.POST,httpEntity, Integer.class).getBody();
-        assertThat(orderId.intValue());
+        assertThat(orderId).isNotNull();
         log.info(String.valueOf(orderId));
 
         uri = "http://localhost:"+ localPort +"/order/"+orderId;
-        String orderStatus = restTemplate.exchange(uri, HttpMethod.GET,httpEntity, String.class).getBody().toString();
-        assertThat(orderStatus.equalsIgnoreCase(OrderStatusEnum.DELIVERED.toString()));
-        log.info(orderStatus);
+        String orderStatus = restTemplate.exchange(uri, HttpMethod.GET,httpEntity, String.class).getBody();
+        assertThat(orderStatus).isEqualTo(OrderStatusEnum.RECEIVED.toString());
+        log.info((orderStatus));
     }
 }
